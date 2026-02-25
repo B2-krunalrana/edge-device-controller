@@ -2,6 +2,8 @@
 
 A FastAPI-based edge device controller with Cloudflare tunnel integration for secure remote access and WebSocket communication.
 
+![alt text](image.png)
+
 ## 📋 Features
 
 - **Cloudflare Tunnel**: Exposes local server to the internet securely
