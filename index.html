@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Find Local Device</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body style="font-family:Arial;text-align:center;">
+
+<h2>Scan Device QR</h2>
+
+<div id="reader" style="width:300px;margin:auto;"></div>
+
+<br>
+<button onclick="runCommand()">Run Command</button>
+
+<pre id="log"></pre>
+
+<script>
+let socket = null;
+
+function onScanSuccess(decodedText) {
+    document.getElementById("log").innerText += "Connecting to: " + decodedText + "\n";
+    
+    socket = new WebSocket(decodedText);
+
+    socket.onopen = function() {
+        document.getElementById("log").innerText += "✅ Connected\n";
+    };
+
+    socket.onmessage = function(event) {
+        document.getElementById("log").innerText += "📨 " + event.data + "\n";
+    };
+
+    socket.onerror = function() {
+        document.getElementById("log").innerText += "❌ Error\n";
+    };
+}
+
+const html5QrCode = new Html5Qrcode("reader");
+Html5Qrcode.getCameras().then(devices => {
+    if (devices.length) {
+        html5QrCode.start(
+            devices[0].id,
+            { fps: 10, qrbox: 250 },
+            onScanSuccess
+        );
+    }
+});
+
+function runCommand() {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send("run_command");
+    } else {
+        alert("Not connected");
+    }
+}
+</script>
+
+</body>
+</html>
